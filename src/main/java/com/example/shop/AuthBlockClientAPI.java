@@ -4,6 +4,10 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
@@ -25,10 +29,21 @@ public class AuthBlockClientAPI {
     }
 
 
-    public String send(String oraLogin, String oraLogout, String username, String userAgent, String ipAddress) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeySpecException, BadPaddingException {
-       String hmac = hmac(username);
-       String data = "[\""+oraLogin+"\",\""+oraLogout+"\",\""+username+"\",\""+userAgent+"\",\""+ipAddress+"\",\""+hmac+"\"]";
-       return rsa(data);
+    public void send(String oraLogin, String oraLogout, String username, String userAgent, String ipAddress) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeySpecException, BadPaddingException, InterruptedException {
+        String hmac = hmac(username);
+        String data = "[\""+oraLogin+"\",\""+oraLogout+"\",\""+username+"\",\""+userAgent+"\",\""+ipAddress+"\",\""+hmac+"\"]";
+
+        String dataEncrypted = rsa(data);
+       System.out.println(dataEncrypted.length());
+       HttpClient client = HttpClient.newHttpClient();
+       HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api"))
+                .POST(HttpRequest.BodyPublishers.ofString("{data:"+dataEncrypted+"}"))
+                .build();
+       System.out.println("{data:"+dataEncrypted+"}");
+       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+       if(response.statusCode() != 200 || !response.body().equals("{result:ok}"))
+           throw new RuntimeException("send failed. Status code: "+response.statusCode()+" Result: "+response.body());
     }
 
     private String rsa(String data) throws NoSuchPaddingException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
