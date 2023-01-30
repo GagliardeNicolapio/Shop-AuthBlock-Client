@@ -17,9 +17,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @Controller
 public class ShopController {
     @GetMapping("/")
-    public String home() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, IllegalBlockSizeException, IOException, InvalidKeySpecException, BadPaddingException, InterruptedException {
+    public String home() throws Exception {
         AuthBlockClientAPI authBlockClientAPI = new AuthBlockClientAPI("chiave");
-        authBlockClientAPI.send("3","4","p444ippo","chhh","555.55");
+
+        AuthBlockClientAPI.Access access = authBlockClientAPI.new Access()
+                .setEthereumUser("x")
+                .setEthereumWebSite("y")
+                .setUrlWebSite("youtube.com")
+                .setOraLogin("23:44").setOraLogout("23:59")
+                .setUsername("nik").setUserAgent("chrome").setIpAddress("8.8.8.8");
+
+        authBlockClientAPI.send(access);
         System.out.println("fine");
         return "index";
     }
