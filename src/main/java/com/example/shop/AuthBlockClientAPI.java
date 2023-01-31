@@ -31,45 +31,73 @@ public class AuthBlockClientAPI {
 
     public class Access{
         private String oraLogin, oraLogout, username, userAgent, ipAddress, ethereumWebSite, ethereumUser, urlWebSite;
-
+        private String oraLoginMAC, oraLogoutMAC, usernameMAC, userAgentMAC, ipAddressMAC, ethereumWebSiteMAC, ethereumUserMAC, urlWebSiteMAC;
         public Access(){}
 
         public Access setOraLogin(String oraLogin)throws Exception{
-            this.oraLogin = rsa(oraLogin+","+hmac(oraLogin));
+            System.out.println("login");
+            this.oraLogin = rsa(oraLogin);
+            this.oraLoginMAC = rsa(hmac(oraLogin));
             return this;
         }
         public Access setOraLogout(String oraLogout)throws Exception{
-            this.oraLogout = rsa(oraLogout+","+hmac(oraLogout));
+            System.out.println("logout");
+
+            this.oraLogout = rsa(oraLogout);
+            this.oraLogoutMAC = rsa(hmac(oraLogout));
             return this;
         }
         public Access setUsername(String username)throws Exception{
-            this.username = rsa(username+","+hmac(username));
+            System.out.println("userna");
+
+            this.username = rsa(username);
+            this.usernameMAC = rsa(hmac(username));
             return this;
         }
         public Access setUserAgent(String userAgent)throws Exception{
-            this.userAgent = rsa(userAgent+","+hmac(userAgent));
+            System.out.println("agent");
+
+            this.userAgent = rsa(userAgent);
+            this.userAgentMAC = rsa(hmac(userAgent));
             return this;
         }
         public Access setIpAddress(String ipAddress)throws Exception{
-            this.ipAddress = rsa(ipAddress+","+hmac(ipAddress));
+            System.out.println("ip");
+
+            this.ipAddress = rsa(ipAddress);
+            this.ipAddressMAC = rsa(hmac(ipAddress));
             return this;
         }
         public Access setEthereumWebSite(String ethereumWebSite)throws Exception{
-            this.ethereumWebSite = rsa(ethereumWebSite+","+hmac(ethereumWebSite));
+            System.out.println("eth esite");
+
+            this.ethereumWebSite = rsa(ethereumWebSite);
+            this.ethereumWebSiteMAC = rsa(hmac(ethereumWebSite));
             return this;
         }
         public Access setEthereumUser(String ethereumUser)throws Exception{
-            this.ethereumUser = rsa(ethereumUser+","+hmac(ethereumUser));
+            System.out.println("eth user");
+
+            this.ethereumUser = rsa(ethereumUser);
+            this.ethereumUserMAC = rsa(hmac(ethereumUser));
             return this;
         }
         public Access setUrlWebSite(String urlWebSite)throws Exception{
-            this.urlWebSite = rsa(urlWebSite+","+hmac(urlWebSite));
+            System.out.println("url");
+
+            this.urlWebSite = rsa(urlWebSite);
+            this.urlWebSiteMAC = rsa(hmac(urlWebSite));
             return this;
         }
 
         private String getData(){
-            //return "data:{oraLogin:\""+oraLogin+"\",oraLogout:\""+oraLogout+"\",username:\""+username+"\",userAgent:\""+userAgent+"\",ipAddress:\""+ipAddress+"\"}";
-            return "{test:\"4\"}";
+            return "[{oraLogin:\""+oraLogin+"\",oraLogout:\""+
+                    oraLogout+"\",username:\""+username+"\",userAgent:\""+userAgent+"\",ipAddress:\""+ipAddress+"\"}," +
+                    "{oraLogin:\""+oraLoginMAC+"\",oraLogout:\""+oraLogoutMAC+"\"," +
+                    "username:\""+usernameMAC+"\",userAgent:\""+userAgentMAC+"\",ipAddress:\""+ipAddressMAC+"\"}]";
+
+
+
         }
     }
 
@@ -79,6 +107,7 @@ public class AuthBlockClientAPI {
        HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/api"))
                 .POST(HttpRequest.BodyPublishers.ofString(access.getData()))
+               .header("Content-Type","application/json")
                 .build();
 
        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -96,7 +125,12 @@ public class AuthBlockClientAPI {
         Cipher encryptCipher = Cipher.getInstance("RSA");
         encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
         byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-        return Base64.getEncoder().encodeToString(encryptCipher.doFinal(dataBytes));
+        System.out.println(dataBytes.length);
+        String bho = Base64.getEncoder().encodeToString(encryptCipher.doFinal(dataBytes));
+        System.out.println(bho);
+        System.out.println(bho.length());
+
+        return bho;
     }
 
     private String hmac(String data) throws Exception {
