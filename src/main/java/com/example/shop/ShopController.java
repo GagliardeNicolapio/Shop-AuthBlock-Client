@@ -24,8 +24,10 @@ public class ShopController {
 
     @PostMapping("/registrazione")
     public String registrazione(@RequestParam("username") String username, @RequestParam("addressEth") String addressEth, HttpServletRequest request ) throws Exception {
+        /*qui il sito salva il nuovo utente nel suo database*/
 
-        //dati da inviare a api authblock
+
+        /*qui il sito invia i dati ad AuthBlock*/
         AuthBlockClientAPI authBlockClientAPI = new AuthBlockClientAPI("chiave");
 
         AuthBlockClientAPI.Access access = authBlockClientAPI.new Access()
@@ -38,6 +40,7 @@ public class ShopController {
                 .setUserAgent(request.getHeader("User-Agent"))
                 .setIpAddress(request.getRemoteAddr());
 
+        authBlockClientAPI.send(access);
         return "areaPrivata";
     }
 }

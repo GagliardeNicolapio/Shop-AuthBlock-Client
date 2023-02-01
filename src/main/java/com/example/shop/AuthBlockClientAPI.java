@@ -91,13 +91,11 @@ public class AuthBlockClientAPI {
         }
 
         private String getData(){
-            return "[{oraLogin:\""+oraLogin+"\",oraLogout:\""+
-                    oraLogout+"\",username:\""+username+"\",userAgent:\""+userAgent+"\",ipAddress:\""+ipAddress+"\"}," +
+            return "[{ethSite:\""+ethereumWebSite+"\",ethUser:\""+ethereumUser+"\"},{ethSite:\""+ethereumWebSiteMAC+"\",ethUser:\""+ethereumUserMAC+"\"}," +
+                    "{oraLogin:\""+oraLogin+"\",oraLogout:\""+
+                    oraLogout+"\",username:\""+username+"\",userAgent:\""+userAgent+"\",ipAddress:\""+ipAddress+"\",url:\""+urlWebSite+"\"}," +
                     "{oraLogin:\""+oraLoginMAC+"\",oraLogout:\""+oraLogoutMAC+"\"," +
-                    "username:\""+usernameMAC+"\",userAgent:\""+userAgentMAC+"\",ipAddress:\""+ipAddressMAC+"\"}]";
-
-
-
+                    "username:\""+usernameMAC+"\",userAgent:\""+userAgentMAC+"\",ipAddress:\""+ipAddressMAC+"\",url:\""+urlWebSiteMAC+"\"}]";
         }
     }
 
