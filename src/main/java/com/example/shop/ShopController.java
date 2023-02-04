@@ -32,7 +32,7 @@ public class ShopController {
 
         AuthBlockClientAPI.Access access = authBlockClientAPI.new Access()
                 .setEthereumUser(addressEth)
-                .setEthereumWebSite("x")
+                .setEthereumWebSite("0xdCC1d026c131580791B318407d3C85c81Da22C24")
                 .setUrlWebSite("www.roachforlife.com")
                 .setOraLogin(new Timestamp(System.currentTimeMillis()).toString())
                 .setOraLogout("")
@@ -41,6 +41,28 @@ public class ShopController {
                 .setIpAddress(request.getRemoteAddr());
 
         authBlockClientAPI.send(access);
+        return "areaPrivata";
+    }
+
+    @PostMapping("login")
+    public String login(@RequestParam("address") String address, HttpServletRequest request) throws Exception {
+        //qui il sito controlla se address è presente nel suo db
+
+        //qui invia i dati a authblock
+        AuthBlockClientAPI authBlockClientAPI = new AuthBlockClientAPI("chiave");
+
+        AuthBlockClientAPI.Access access = authBlockClientAPI.new Access()
+                .setEthereumUser(address)
+                .setEthereumWebSite("0xdCC1d026c131580791B318407d3C85c81Da22C24")
+                .setUrlWebSite("www.roachforlife.com")
+                .setOraLogin(new Timestamp(System.currentTimeMillis()).toString())
+                .setOraLogout("")
+                .setUsername("username")
+                .setUserAgent(request.getHeader("User-Agent"))
+                .setIpAddress(request.getRemoteAddr());
+
+        authBlockClientAPI.send(access);
+
         return "areaPrivata";
     }
 }
