@@ -24,19 +24,12 @@ function showAddress() {
     //document.getElementById("logoutButton").classList.remove("hidden");
 }
 
-// remove stored user address and reset frontend
-function logout() {
-    window.userAddress = null;
-    window.localStorage.removeItem("userAddress");
-    showAddress();
-}
 
+/*
 // Login with Web3 via Metamasks window.ethereum library
 async function loginWithEth() {
     if (window.web3) {
         try {
-            // We use this since ethereum.enable() is deprecated. This method is not
-            // available in Web3JS - so we call it directly from metamasks' library
             const selectedAccount = await window.ethereum
                 .request({
                     method: "eth_requestAccounts",
@@ -48,6 +41,44 @@ async function loginWithEth() {
             window.userAddress = selectedAccount;
             window.localStorage.setItem("userAddress", selectedAccount);
             document.getElementById("metaInput").value = selectedAccount
+        } catch (error) {
+            console.error(error);
+        }
+    } else {
+        alert("No ETH brower extension detected.");
+    }
+}
+*/
+function getAddress(){
+    var address = document.getElementById("metaInput").value
+
+    localStorage.setItem("address", address )
+    window.userAddress = address
+    return true;
+}
+
+async function insertAddressLogout(formId, inputId) {
+    var indirizzo = localStorage.getItem("address")
+   localStorage.removeItem("address")
+    document.getElementById(inputId).value = indirizzo
+    document.getElementById(formId).submit()
+}
+async function insertAddress(formId, inputId){
+    if (window.web3) {
+        try {
+            const selectedAccount = await window.ethereum
+                .request({
+                    method: "eth_requestAccounts",
+                })
+                .then((accounts) => accounts[0])
+                .catch(() => {
+                    throw Error("No account selected!");
+                });
+            window.userAddress = selectedAccount;
+            localStorage.setItem("address", selectedAccount )
+
+            document.getElementById(inputId).value = selectedAccount
+            document.getElementById(formId).submit()
         } catch (error) {
             console.error(error);
         }

@@ -10,36 +10,38 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class AuthBlockClientAPI {
-    private String keyMAC;
     private String algorithm = "HmacSHA256";
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    private static HttpClient client;
+    private static String indirizzoEth, keyMAC, urlSito;
 
-    public AuthBlockClientAPI(String keyMAC){
-        this.keyMAC = keyMAC;
+    public AuthBlockClientAPI(String macKey, String indirizzoSito, String urlSito){
+        keyMAC = macKey;
+        client =  HttpClient.newHttpClient();
+        indirizzoEth = indirizzoSito;
+        AuthBlockClientAPI.urlSito = urlSito;
     }
 
 
     public class Access{
-        private String oraLogin, oraLogout, username, userAgent, ipAddress, ethereumWebSite, ethereumUser, urlWebSite;
-        private String oraLoginMAC, oraLogoutMAC, usernameMAC, userAgentMAC, ipAddressMAC, ethereumWebSiteMAC, ethereumUserMAC, urlWebSiteMAC;
-        public Access(){}
-
-        public Access setOraLogin(String oraLogin)throws Exception{
-            System.out.println("login");
-            this.oraLogin = rsa(oraLogin);
-            this.oraLoginMAC = rsa(hmac(oraLogin));
-            return this;
+        private final String ethereumWebSite, ethereumWebSiteMAC, urlWebSite, urlWebSiteMAC;
+        private String  oraLogout, username, userAgent, ipAddress, ethereumUser;
+        private String  oraLogoutMAC, usernameMAC, userAgentMAC, ipAddressMAC, ethereumUserMAC;
+        public Access() throws Exception {
+            this.ethereumWebSite = rsa(indirizzoEth);
+            this.ethereumWebSiteMAC = rsa(hmac(indirizzoEth));
+            this.urlWebSite = rsa(urlSito);
+            this.urlWebSiteMAC = rsa(hmac(urlSito));
         }
+
+
         public Access setOraLogout(String oraLogout)throws Exception{
             System.out.println("logout");
 
@@ -68,13 +70,13 @@ public class AuthBlockClientAPI {
             this.ipAddressMAC = rsa(hmac(ipAddress));
             return this;
         }
-        public Access setEthereumWebSite(String ethereumWebSite)throws Exception{
+       /* public Access setEthereumWebSite(String ethereumWebSite)throws Exception{
             System.out.println("eth esite");
 
             this.ethereumWebSite = rsa(ethereumWebSite);
             this.ethereumWebSiteMAC = rsa(hmac(ethereumWebSite));
             return this;
-        }
+        }*/
         public Access setEthereumUser(String ethereumUser)throws Exception{
             System.out.println("eth user");
 
@@ -82,28 +84,48 @@ public class AuthBlockClientAPI {
             this.ethereumUserMAC = rsa(hmac(ethereumUser));
             return this;
         }
-        public Access setUrlWebSite(String urlWebSite)throws Exception{
+      /*  public Access setUrlWebSite(String urlWebSite)throws Exception{
             System.out.println("url");
 
             this.urlWebSite = rsa(urlWebSite);
             this.urlWebSiteMAC = rsa(hmac(urlWebSite));
             return this;
-        }
+        }*/
 
         private String getData(){
             return "[{ethSite:\""+ethereumWebSite+"\",ethUser:\""+ethereumUser+"\"},{ethSite:\""+ethereumWebSiteMAC+"\",ethUser:\""+ethereumUserMAC+"\"}," +
-                    "{oraLogin:\""+oraLogin+"\",oraLogout:\""+
+                    "{oraLogout:\""+
                     oraLogout+"\",username:\""+username+"\",userAgent:\""+userAgent+"\",ipAddress:\""+ipAddress+"\",url:\""+urlWebSite+"\"}," +
-                    "{oraLogin:\""+oraLoginMAC+"\",oraLogout:\""+oraLogoutMAC+"\"," +
+                    "{oraLogout:\""+oraLogoutMAC+"\"," +
                     "username:\""+usernameMAC+"\",userAgent:\""+userAgentMAC+"\",ipAddress:\""+ipAddressMAC+"\",url:\""+urlWebSiteMAC+"\"}]";
         }
     }
 
-    public void send(Access access) throws IOException, InterruptedException {
+    public void sendLogout(String indirizzoUtente) throws Exception {
+        String data = "{sito:\"" + rsa(indirizzoEth) + "\", utente:\"" + rsa(indirizzoUtente) +
+                "\", sitoHmac:\""+ rsa(hmac(indirizzoEth)) + "\", utenteHmac:\"" + rsa(hmac(indirizzoUtente)) + "\"}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/logout"))
+                .POST(HttpRequest.BodyPublishers.ofString(data))
+                .header("Content-Type","application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if(response.statusCode() != 200 || !response.body().equals("{result:ok}"))
+            throw new RuntimeException("send failed. Status code: "+response.statusCode()+" Result: "+response.body());
+    }
+
+    public void insertNewUser(Access access) throws IOException, InterruptedException {
+        this.send(access, "http://localhost:8080/api?newUser=true");
+    }
+
+    public void insertAccess(Access access) throws IOException, InterruptedException {
+        this.send(access, "http://localhost:8080/api?newUser=false");
+    }
+
+    private void send(Access access, String url) throws IOException, InterruptedException {
         System.out.println(access.getData());
-       HttpClient client = HttpClient.newHttpClient();
        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api"))
+                .uri(URI.create(url))
                 .POST(HttpRequest.BodyPublishers.ofString(access.getData()))
                .header("Content-Type","application/json")
                 .build();
@@ -111,6 +133,19 @@ public class AuthBlockClientAPI {
        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
        if(response.statusCode() != 200 || !response.body().equals("{result:ok}"))
            throw new RuntimeException("send failed. Status code: "+response.statusCode()+" Result: "+response.body());
+    }
+
+    public boolean checkUser(String indirizzoUtente) throws Exception {
+        String data = "{indirizzoSito:\""+rsa(indirizzoEth)+"\", indirizzoSitoHmac:\""+rsa(hmac(indirizzoEth))+"\", indirizzoUtente:\""+rsa(indirizzoUtente)+"\", indirizzoUtenteHmac:\""+rsa(hmac(indirizzoUtente))+"\"}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/checkUser"))
+                .POST(HttpRequest.BodyPublishers.ofString(data))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if(response.statusCode() == 200 && response.body().equals("{result:true}"))
+            return true;
+        else return false;
     }
 
     private String rsa(String data) throws Exception {

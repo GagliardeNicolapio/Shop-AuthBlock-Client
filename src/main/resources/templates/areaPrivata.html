@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{partials/head.html :: head}"></head>
+
 <body>
-area privata
+<div>
+    <div th:replace="~{partials/banner.html :: banner(registrati=false, login=false)}"></div>
+</div>
+
+
+<div>
+    <div th:replace="~{partials/dati.html :: dati(ben=${fraseBenvenuto}, add=${address}, user=${username}, ip=${ip})}"></div>
+</div>
+
+
+
+<!--
+<h5>Dati inviati ad AuthBlock:</h5>
+<p th:text="${address}" />
+<p th:text="${username}"/>
+<p th:text="${UserAgent}"/>
+<p th:text="${ip}"/>
+-->
+
+
+<form action="/logout" method="post" id="logoutForm">
+    <input type="hidden" name="address" id="logoutInput">
+</form>
+
+<div th:replace="~{partials/footer.html :: footer}"></div>
+<script th:src="@{/js/loginMetaMask.js}"></script>
 </body>
 </html>

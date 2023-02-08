@@ -17,8 +17,8 @@
                             <li><a href="#">Home</a></li>
 
                             <li th:if="${registrati==true}"><a href="/registrazione">Registrati</a></li>
-                            <li th:if="${login==true}"><a href="#" onclick="loginWithEth()">Login con MetaMask</a></li>
-                            <li th:unless="${login==true}">Logout</li>
+                            <li th:if="${login==true}"><a href="#" onclick="insertAddress('formId','addressForm')">Login con MetaMask</a></li>
+                            <li th:unless="${login==true}"> <a href="#" onclick="insertAddressLogout('logoutForm','logoutInput')"> Logout </a> </li>
                         </ul>
                     </div>
                 </div>

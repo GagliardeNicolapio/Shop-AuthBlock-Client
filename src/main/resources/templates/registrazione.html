@@ -1,81 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <!-- basic -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- mobile metas -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-    <!-- site metas -->
-    <title>Roach For Life</title>
-    <meta name="keywords" content="">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <!-- bootstrap css -->
-    <link rel="stylesheet" type="text/css" th:href="@{css/bootstrap.min.css}">
-    <!-- style css -->
-    <link rel="stylesheet" type="text/css" th:href="@{css/style.css}">
-    <!-- Responsive-->
-    <link rel="stylesheet" th:href="@{css/responsive.css}">
-    <!-- fevicon -->
-    <link rel="icon" th:href="@{images/fevicon.png}" type="image/gif" />
-    <!-- Scrollbar Custom CSS -->
-    <link rel="stylesheet" th:href="@{css/jquery.mCustomScrollbar.min.css}">
-    <!-- Tweaks for older IEs-->
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-    <!-- fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
-    <!-- font awesome -->
-    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!--  -->
-    <!-- owl stylesheets -->
-    <link href="https://fonts.googleapis.com/css?family=Great+Vibes|Poppins:400,700&display=swap&subset=latin-ext" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{css/owl.carousel.min.css}">
-    <link rel="stylesoeet" th:href="@{css/owl.theme.default.min.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+<head th:insert="~{partials/head.html :: head}"></head>
 
-    <style>
-        #formRegistrazione input[type=text], select {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        #formRegistrazione input[type=submit] {
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #formRegistrazione input[type=submit]:hover {
-            background-color: #45a049;
-        }
-
-        #formRegistrazione div {
-            border-radius: 5px;
-
-            padding: 20px;
-        }
-    </style>
-</head>
 <body>
 <div th:replace="~{partials/banner.html :: banner(registrati=false, login=true)}"></div>
 
 <!-- fashion section start -->
 <div class="fashion_section" id="formRegistrazione">
     <div>
-        <form action="/registrazione" method="post">
+        <form action="/registrazione" method="post" id="formReg">
             <label for="fname">Username</label>
             <input type="text" id="fname" name="username" placeholder="Inserisci una username" required>
 
@@ -83,9 +16,9 @@
             <input type="text" id="metaInput" name="addressEth" placeholder="Inserisci il tuo indirizzo Ethereum" required>
 
             <label for="metamask">Oppure usa MetaMask</label>
-            <img th:src="@{/images/metamask.png}" id="metamask" onclick="loginWithEth()" style="width: 35px;cursor: pointer;">
+            <img th:src="@{/images/metamask.png}" id="metamask" onclick='insertAddress("formReg","metaInput")' style="width: 35px;cursor: pointer;">
 
-            <input type="submit" value="Invia">
+            <input type="submit" value="Invia" onclick="return getAddress();">
         </form>
     </div>
 </div>
