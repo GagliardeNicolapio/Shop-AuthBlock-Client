@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @Controller
 @RequestMapping(value = "")
 public class ShopController {
-    private static final String url="www.roachforlife.com", chiaveHMAC = "chiave", indirizzoSito = "0x3B06eEb99C6dFc819A797348DB74CB38Ff004dAC";
+    private static final String url="www.roachforlife.com", chiaveHMAC = "chiave", indirizzoSito = "0xd4282a7B2fD47b351193e5Df2DBa0DF5AC07C521";
 
     @GetMapping("")
     public String home(){
@@ -31,6 +31,7 @@ public class ShopController {
             model.addAttribute("utenteGiaPresente", true);
             return "index";
         }else{
+            System.out.println(username);
             AuthBlockClientAPI.Access access = authBlockClientAPI.new Access()
                     .setEthereumUser(addressEth)
                     .setOraLogout("")

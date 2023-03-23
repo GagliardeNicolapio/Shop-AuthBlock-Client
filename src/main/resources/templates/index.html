@@ -63,6 +63,7 @@
      <div th:replace="~{partials/footer.html :: footer}"></div>
 
       <script th:src="@{/js/loginMetaMask.js}"></script>
+      <script th:src="@{/js/web3.min.js}"></script>
       <script th:if="@{flagUtenteTrovato==false}">alert('utente non registrato')</script>
       <script th:if="@{utenteGiaPresente==true}">alert('utente già registrato')</script>
    </body>
